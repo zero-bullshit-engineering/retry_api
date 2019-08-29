@@ -1,5 +1,10 @@
 # RetryApi
 
+This Repository serves as a sample for using idempotency tokens for retryable requests.
+
+
+## Startup
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
