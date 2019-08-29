@@ -2,10 +2,13 @@ defmodule RetryApiWeb.IdempotencyPlug do
   import Plug.Conn
   require Logger
 
-  def init(_opts), do: []
+  def init(options \\ []) do
+    defaults = [header_name: "x-idempotency-token"]
+    Keyword.merge(defaults, options) |> Enum.into(%{})
+  end
 
-  defp check_header(conn) do
-    case get_req_header(conn, "x-idempotency-token") do
+  defp check_header(conn, header_name) do
+    case get_req_header(conn, header_name) do
       [] ->
         {:error, :no_token_in_header}
 
@@ -24,8 +27,8 @@ defmodule RetryApiWeb.IdempotencyPlug do
     end
   end
 
-  def call(conn, _opts) do
-    with {:ok, token} <- check_header(conn),
+  def call(conn, %{header_name: header_name}) do
+    with {:ok, token} <- check_header(conn, header_name),
          {:ok, {_key, data}} <- check_cache(token) do
       Logger.info("Responding with cached idempotency request")
 
